@@ -1,0 +1,53 @@
+# --- Generated font-tooling output (regeneratable with fontTools/TTX) ---
+ttx_out/
+**/split_g/
+**/split_t/
+**/ftest/
+*.ttx.tmp
+*.ttx.bak
+
+# --- Intermediate / build artifacts ---
+# excl_check.ttf
+# times_noglyf.ttx
+
+# --- Large/proprietary source fonts (not for redistribution) ---
+# Uncomment to keep these out of the repo; some exceed GitHub's size limits.
+# cambria.ttc
+# msyh.ttc
+# Songti.ttc
+# NotoSerifCJKsc-VF.ttf
+# SourceHanSansSC-Regular.otf
+
+# --- Python (fonttools workflows) ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+env/
+.Python
+build/
+dist/
+.eggs/
+
+# --- Editor / IDE ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.settings/
+
+# --- OS cruft ---
+.DS_Store
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+ehthumbs.db
+
+# --- Logs / temp ---
+*.log
+*.tmp
+.cache/
