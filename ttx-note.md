@@ -28,7 +28,7 @@
 `ttx` 是开源字体工具包 **fontTools** 提供的命令行工具，用于在 **二进制字体文件**（OpenType / TrueType）和 **TTX**（一种基于 XML 的文本格式）之间做**双向转换**：
 
 ```
-                                反编译 (decompile / dump)             
+                                反编译 (decompile / dump)         
 字体文件(.ttf/.otf/.ttc/.woff)  ───────────────────────────► TTX 文件 (.ttx)
 字体文件(.ttf/.otf/.ttc/.woff)  ◄─────────────────────────── TTX 文件 (.ttx)
                                       编译 (compile)
@@ -61,10 +61,10 @@ $ ttx --version
 
 ## 1.3 两种工作模式
 
-| 模式 | 触发条件 | 作用 |
-|------|----------|------|
-| **Dump（反编译）** | 输入是字体文件 | 字体 → TTX (XML) |
-| **Compile（编译）** | 输入是 `.ttx` 文件 | TTX (XML) → 字体 |
+| 模式                      | 触发条件            | 作用              |
+| ------------------------- | ------------------- | ----------------- |
+| **Dump（反编译）**  | 输入是字体文件      | 字体 → TTX (XML) |
+| **Compile（编译）** | 输入是`.ttx` 文件 | TTX (XML) → 字体 |
 
 > **安全设计**：ttx 生成的输出文件**永不覆盖同名已有文件**，而是自动追加序号（如 `times#1.ttx`）。需要覆盖时加 `-f`。
 
@@ -189,44 +189,44 @@ Compile options
 
 ## 2.2 通用选项（General options）逐条详解
 
-| 选项 | 中文释义 | 说明 |
-|------|----------|------|
-| `-h` | 打印帮助信息 | 真正的帮助触发符；`--help` 反而会报错 |
-| `--version` | 显示版本号并退出 | 例：`4.61.0` |
-| `-d <目录>` | 指定输出文件**目录** | ⚠️ **该目录必须事先存在**，否则报错 `The -d option value must be an existing directory` |
-| `-o <文件>` | 指定输出**文件名**；`-o -` 表示输出到**标准输出** | ⚠️ **`-o` 与 `-d` 同时出现时，`-o` 生效、`-d` 被忽略**，文件按 `-o` 的值（相对当前目录）写出 |
-| `-f` | 覆盖已有输出文件（不追加序号） | 默认行为是永不覆盖、自动加 `#1`/`#2`… |
-| `-v` | 详细模式：打印更多进度信息 | 如 `Reading 'head' table from disk` / `Decompiling ...` |
-| `-q` | 静默模式：不打印任何进度信息 | 适合脚本化批量处理 |
-| `-a` | 允许编译/反编译时使用**虚拟字形 ID** | 边缘场景，处理引用了不存在字形 ID 的字体时使用 |
+| 选项          | 中文释义                                                        | 说明                                                                                                    |
+| ------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `-h`        | 打印帮助信息                                                    | 真正的帮助触发符；`--help` 反而会报错                                                                 |
+| `--version` | 显示版本号并退出                                                | 例：`4.61.0`                                                                                          |
+| `-d <目录>` | 指定输出文件**目录**                                      | ⚠️**该目录必须事先存在**，否则报错 `The -d option value must be an existing directory`        |
+| `-o <文件>` | 指定输出**文件名**；`-o -` 表示输出到**标准输出** | ⚠️**`-o` 与 `-d` 同时出现时，`-o` 生效、`-d` 被忽略**，文件按 `-o` 的值（相对当前目录）写出 |
+| `-f`        | 覆盖已有输出文件（不追加序号）                                  | 默认行为是永不覆盖、自动加`#1`/`#2`…                                                               |
+| `-v`        | 详细模式：打印更多进度信息                                      | 如`Reading 'head' table from disk` / `Decompiling ...`                                              |
+| `-q`        | 静默模式：不打印任何进度信息                                    | 适合脚本化批量处理                                                                                      |
+| `-a`        | 允许编译/反编译时使用**虚拟字形 ID**                      | 边缘场景，处理引用了不存在字形 ID 的字体时使用                                                          |
 
 ## 2.3 Dump 选项（反编译时）逐条详解
 
-| 选项 | 中文释义 | 说明 |
-|------|----------|------|
-| `-l` | **列表模式**：不导出 TTX，只列出每张表的标签/校验和/长度/偏移 | 快速体检字体的第一手段 |
-| `-t <表>` | 只导出指定的表（可多次 `-t`） | 不带 `-t` 时导出全部表 |
-| `-x <表>` | 排除指定的表（可多次 `-x`） | `-t` 与 `-x` **互斥**，不能同时用 |
-| `-s` | **按表拆分**：每张表单独一个 `.ttx` 文件，另写一个引用它们的小主文件 | 便于逐表编辑、Git 提交 |
-| `-g` | **按字形拆分 glyf**：每个字形单独一个文件 | `-g` 隐含 `-s`，无需再写 `-s` |
-| `-i` | **不反汇编** TrueType 指令，改为十六进制输出 | 更快、文件更小；默认会把指令反汇编成可读汇编 |
-| `-z <格式>` | 位图（EBDT/CBDT）导出格式：`raw`/`row`/`bitwise`/`extfile` | 见 [4.9 节](#49--z-位图导出格式) |
-| `-e` | 不忽略反编译错误，打印完整 traceback 并中止 | 调试损坏字体时使用 |
-| `-y <编号>` | 选择 TTC/OTC 字体集合中的字体编号（从 0 起） | 字体集合 `.ttc` 含多个字体，必须用 `-y` 指定 |
-| `--unicodedata <文件>` | 用自定义 Unicode 数据库，在 cmap 输出注释里写字符名 | 自定义/扩展 Unicode 版本时使用 |
-| `--newline <值>` | 控制 XML 行尾：`LF` / `CR` / `CRLF` | 不指定则用平台默认 |
+| 选项                     | 中文释义                                                                     | 说明                                            |
+| ------------------------ | ---------------------------------------------------------------------------- | ----------------------------------------------- |
+| `-l`                   | **列表模式**：不导出 TTX，只列出每张表的标签/校验和/长度/偏移          | 快速体检字体的第一手段                          |
+| `-t <表>`              | 只导出指定的表（可多次`-t`）                                               | 不带`-t` 时导出全部表                         |
+| `-x <表>`              | 排除指定的表（可多次`-x`）                                                 | `-t` 与 `-x` **互斥**，不能同时用     |
+| `-s`                   | **按表拆分**：每张表单独一个 `.ttx` 文件，另写一个引用它们的小主文件 | 便于逐表编辑、Git 提交                          |
+| `-g`                   | **按字形拆分 glyf**：每个字形单独一个文件                              | `-g` 隐含 `-s`，无需再写 `-s`             |
+| `-i`                   | **不反汇编** TrueType 指令，改为十六进制输出                           | 更快、文件更小；默认会把指令反汇编成可读汇编    |
+| `-z <格式>`            | 位图（EBDT/CBDT）导出格式：`raw`/`row`/`bitwise`/`extfile`           | 见[4.9 节](#49--z-位图导出格式)                  |
+| `-e`                   | 不忽略反编译错误，打印完整 traceback 并中止                                  | 调试损坏字体时使用                              |
+| `-y <编号>`            | 选择 TTC/OTC 字体集合中的字体编号（从 0 起）                                 | 字体集合`.ttc` 含多个字体，必须用 `-y` 指定 |
+| `--unicodedata <文件>` | 用自定义 Unicode 数据库，在 cmap 输出注释里写字符名                          | 自定义/扩展 Unicode 版本时使用                  |
+| `--newline <值>`       | 控制 XML 行尾：`LF` / `CR` / `CRLF`                                    | 不指定则用平台默认                              |
 
 ## 2.4 Compile 选项（编译时）逐条详解
 
-| 选项 | 中文释义 | 说明 |
-|------|----------|------|
-| `-m <字体>` | 把 TTX 文件**合并**进一个已有的字体文件 | 最多只能指定一个 TTX 文件；用于"只改几张表"的工作流 |
-| `-b` | 不重新计算字形包围盒（bbox），直接用 TTX 里的值 | 默认会重算 |
-| `--recalc-timestamp` | 把字体 `modified` 时间戳设为**当前时间** | 默认用 TTX 文件的修改时间 |
-| `--no-recalc-timestamp` | 保留字体**原始** `modified` 时间戳 | |
-| `--flavor <类型>` | 输出字体风味：`woff` 或 `woff2` | WOFF2 需额外安装 brotli |
-| `--with-zopfli` | 用 Zopfli（而非 Zlib）压缩 WOFF | 压缩率更高但更慢；需装 zopfli |
-| `--optimize-font-speed` | 优化渲染速度优先于体积 | 主要影响 glyf / gvar / VARC 的编译方式；产物更大但 HarfBuzz 等渲染更快 |
+| 选项                      | 中文释义                                        | 说明                                                                   |
+| ------------------------- | ----------------------------------------------- | ---------------------------------------------------------------------- |
+| `-m <字体>`             | 把 TTX 文件**合并**进一个已有的字体文件   | 最多只能指定一个 TTX 文件；用于"只改几张表"的工作流                    |
+| `-b`                    | 不重新计算字形包围盒（bbox），直接用 TTX 里的值 | 默认会重算                                                             |
+| `--recalc-timestamp`    | 把字体`modified` 时间戳设为**当前时间** | 默认用 TTX 文件的修改时间                                              |
+| `--no-recalc-timestamp` | 保留字体**原始** `modified` 时间戳      |                                                                        |
+| `--flavor <类型>`       | 输出字体风味：`woff` 或 `woff2`             | WOFF2 需额外安装 brotli                                                |
+| `--with-zopfli`         | 用 Zopfli（而非 Zlib）压缩 WOFF                 | 压缩率更高但更慢；需装 zopfli                                          |
+| `--optimize-font-speed` | 优化渲染速度优先于体积                          | 主要影响 glyf / gvar / VARC 的编译方式；产物更大但 HarfBuzz 等渲染更快 |
 
 ---
 
@@ -244,9 +244,45 @@ OpenType/TrueType 字体本质是一个 **sfnt 容器**，里面装着一堆带 
 - `GSUB` / `GPOS`——OpenType 布局（替换 / 定位）
 - ……
 
+### 3.1.1 sfnt 容器的二进制结构
+
+"sfnt" 本身只是一种**容器（包装）格式**（源自 Apple，原指 "spline font"），规定"如何把若干张表打包进一个文件"——至于里面装的是 TrueType 轮廓还是 CFF 轮廓，容器并不关心。`.ttf` 和 `.otf` 用的是**同一个 sfnt 容器**，区别只在文件头的"魔数"和内部的轮廓表。文件由三段顺序排列：
+
+1. **偏移表（Offset Table，12 字节）**——容器头，给出表的数量与查找参数；
+2. **表目录（Table Directory）**——每张表一个 16 字节条目，告诉你这张表在文件里的位置；
+3. **表数据**——各张表的实际字节，按 4 字节对齐填充。
+
+偏移表第一个 4 字节是 **sfVersion 魔数**，一眼区分字体类型：
+
+| 魔数（十六进制）                     | ASCII               | 含义                                      |
+| ------------------------------------ | ------------------- | ----------------------------------------- |
+| `00 01 00 00`                      | —                  | TrueType（`.ttf`，轮廓在 `glyf`）     |
+| `4F 54 54 4F`                      | `OTTO`            | OpenType/CFF（`.otf`，轮廓在 `CFF `） |
+| `74 72 75 65` / `00 74 79 70 31` | `true` / `typ1` | 个别字体用的等价标记                      |
+
+以 `times.ttf` 为例，文件开头的真实字节（`xxd` 输出）：
+
+```
+00000000: 0001 0000 0019 0100 0004 0090 4453 4947  ............DSIG
+00000010: ac40 e597 0012 3028 0000 25ac 4744 4546  .@....0(..%.GDEF
+00000020: 240e 2921 000f c010 0000 0340 4750 4f53  $.)!.......@GPOS
+```
+
+逐段拆解：
+
+- **偏移表（前 12 字节 `00 01 00 00 | 00 19 | 01 00 | 00 04 | 00 90`）**：
+  - `00 01 00 00` — sfVersion，TrueType 魔数；
+  - `00 19` — numTables = **25**（本字体含 25 张表）；
+  - `01 00 / 00 04 / 00 90` — searchRange=256、entrySelector=4、rangeShift=144，是为**二分查找预计算**的参数（`searchRange = 2^⌊log₂N⌋ × 16`、`rangeShift = N×16 − searchRange`），现代实现基本忽略，留作兼容。
+- **表目录（紧跟其后，每张表 16 字节 = tag 4 + checkSum 4 + offset 4 + length 4）**：第一条是 `DSIG`——`ac40e597`(校验和) `00123028`(偏移=1191976) `000025ac`(长度=9644)；第二条 `GDEF`——`240e2921` `000fc010`(1032208) `00000340`(832)。`tag` 是 4 个 ASCII 字符；`checkSum` 用于校验该表数据完整性。
+
+> 想读取某张表，容器只需"在表目录里按 tag 查到 offset + length，再跳到该偏移读 length 字节"——这正是所有字体工具（含 `ttx`）定位表的方式。
+
+**与 `ttx -l` 的对应**：`ttx -l` 的四列 `tag / checksum / length / offset` 就是把**表目录的四个字段**原样打印。对照上面的 `times.ttf` 目录——DSIG offset=1191976 length=9644、GDEF offset=1032208 length=832——与 [3.2 节](#32-ttx--l-列表实战5-个字体对比)的 `ttx -l` 输出逐字一致。这也是 TTX 根元素写作 `<ttFont sfntVersion="\x00\x01\x00\x00">`（TrueType）或 `sfntVersion="OTTO"`（CFF）的原因——它记录的正是偏移表里的这个魔数。
+
 `ttx -l` 是查看一个字体"装了哪些表"的最快方式。
 
-## 3.2 ttx -l 列表实战（4 个字体对比）
+## 3.2 ttx -l 列表实战（5 个字体对比）
 
 ### Times New Roman（`times.ttf`，西文 TrueType）
 
@@ -369,6 +405,36 @@ $ ttx -l SourceHanSansSC-Regular.otf
 
 这是 **CID-keyed CFF** 字体（PostScript 轮廓）：用 `CFF ` 表（15.5 MB）而非 `glyf`；`maxp` 只有 **6 字节**（CFF 字体的 maxp 极简）；含 `VORG`（纵向原点）、`BASE`（基线表）、`vhea`/`vmtx`（CJK 纵向）、超大 `GSUB`(167 KB)。
 
+### 思源宋体可变版（`NotoSerifCJKsc-VF.ttf`，可变 TrueType）
+
+```
+$ ttx -l NotoSerifCJKsc-VF.ttf
+    ----  ----------  --------  --------
+    BASE  0x711D8E91       278  35032040
+    GDEF  0x0FD3FF04       202  35293520
+    GPOS  0x9767C28C    121036  35293724
+    GSUB  0x3847F4A4    163842  35414760
+    HVAR  0xD4DA58D3     63253  35578604
+    OS/2  0x9EFB1491        96       472
+    STAT  0x80E79632       182  35641860
+    avar  0x79F58926        42  35642044
+    cmap  0x851F7BE2    234521    262424
+    fvar  0x8D4C75DC       106  35642088
+    glyf  0xCCA2ECA7  34269540    759092
+    gvar  0x032BB0A0  24257464  35642196
+    head  0x2C3A7C61        54       348
+    hhea  0x0C160765        36       404
+    hmtx  0x46FC1B45    261854       568
+    loca  0xC4145630    262144    496948
+    maxp  0x0066041C        32       440
+    name  0x46EA21BD      3373  35028632
+    post  0xFFB80032        32  35032008
+    vhea  0x0CBF1564        36  59899660
+    vmtx  0x218657EB    261198  35032320
+```
+
+这是一个**可变字体**（Variable Font）。注意它用的是 **TrueType（`glyf`）轮廓**而非 CFF——可变版 Noto 与上面的静态思源黑体轮廓格式不同。比静态字体多了 5 张可变字体专属表：`fvar`（轴定义）、`STAT`（轴值命名）、`avar`（轴映射）、`gvar`（字形差量）、`HVAR`（度量差量）。其中 `gvar`（24 MB）是全字体最大表，承载 6 万多字形的形变差量；这些表的逐表解读见 [6.15 节](#615-可变字体表族fvar-stat-avar-gvar-hvar)。
+
 ## 3.3 TTC/OTC 字体集合：枚举各 index
 
 ### 3.3.1 什么是 TTC/OTC 字体集合
@@ -421,26 +487,140 @@ Listing table info for "Songti.ttc":
 
 `-y` 只能列出表清单。要拿到「序号 / 字重 / 名称 / 版权」这类**字体元数据**，得读 **`name` 表**（命名表）和 **`OS/2` 表**。字段对应关系：
 
-| 目标字段 | 来源 |
-|----------|------|
-| 序号 | TTC 内的 index（即 `-y` 值，从 0 起） |
-| 字重（数值 300/400/700/900） | `OS/2.usWeightClass` |
-| 英文名称 / 英文字重 | `name`：nameID=**1**（Family）/ nameID=**2**（Subfamily），语言=英文 |
-| 简体名称 / 简体字重 | 同上，语言=简体中文 |
-| 繁体名称 / 繁体字重 | 同上，语言=繁体中文 |
-| 版权年份 | `name`：nameID=**0**（Copyright），用正则提取年份 |
+| 目标字段                     | 来源                                                                               |
+| ---------------------------- | ---------------------------------------------------------------------------------- |
+| 序号                         | TTC 内的 index（即`-y` 值，从 0 起）                                             |
+| 字重（数值 300/400/700/900） | `OS/2.usWeightClass`                                                             |
+| 英文名称 / 英文字重          | `name`：nameID=**1**（Family）/ nameID=**2**（Subfamily），语言=英文 |
+| 简体名称 / 简体字重          | 同上，语言=简体中文                                                                |
+| 繁体名称 / 繁体字重          | 同上，语言=繁体中文                                                                |
+| 版权年份                     | `name`：nameID=**0**（Copyright），用正则提取年份                          |
 
 `name` 表里每条记录由三元组 **(platformID, encodingID, langID)** 定位语言，常见值：
 
-| 语言 | Windows 平台 (platformID=3) | Mac 平台 (platformID=1) |
-|------|------------------------------|--------------------------|
-| 英文 | (3, 1, 0x409) | (1, 0, 0) |
-| 简体中文 | (3, 1, 0x804) | (1, 25, 33) |
-| 繁体中文 | (3, 1, 0x404) | (1, 2, 19) |
+| 语言     | Windows 平台 (platformID=3) | Mac 平台 (platformID=1) |
+| -------- | --------------------------- | ----------------------- |
+| 英文     | (3, 1, 0x409)               | (1, 0, 0)               |
+| 简体中文 | (3, 1, 0x804)               | (1, 25, 33)             |
+| 繁体中文 | (3, 1, 0x404)               | (1, 2, 19)              |
 
 > ⚠️ **真实字体的 name 记录并不统一**：新字体一般只写 Windows 平台，**老字体（如 STSong）常只有 Mac 平台**记录。因此查询时必须 **Windows 优先、Mac 兜底**，否则会取到空值（见下文 index 4）。
 
-### 3.3.5 实战：Songti.ttc 完整枚举
+### 3.3.5 实战：SourceHanMono.ttc 子字体名与 name 表
+
+下面这个实战做两件事：① 列出全部子字体（第一列为解包后的 `.ttf` 文件名）；② 把单个子字体携带的**全部常用 name 记录**逐条列出来。`SourceHanMono.ttc`（思源等宽，Adobe/Google 开源）先看它装了几个子字体：
+
+```
+$ ttx -l SourceHanMono.ttc
+ERROR: specify a font number between 0 and 69 (inclusive)
+```
+
+→ 共 **70 个**子字体。
+
+**① 列出全部子字体（.ttf 文件名 + Family/Subfamily）**
+
+把 TTC 解包成单独的 `.ttf` 时，文件名通常取 **PostScript 名(nameID=6) + `.ttf`**（PostScript 名是文件系统安全的唯一标识：无空格、纯 ASCII）。下面脚本遍历每个子字体，第一列给解包后的 `.ttf` 文件名，再列 Family(1)、Subfamily(2)：
+
+```python
+from fontTools.ttLib import TTCollection
+c = TTCollection('SourceHanMono.ttc')
+def name(f, nid):
+    r = f['name'].getName(nid, 3, 1, 0x409)   # Windows 平台、英文
+    return r.toUnicode() if r else ''
+print(f'{"filename (.ttf)":<34}{"Family(1)":<23}Subfamily(2)')
+print('-' * 72)
+for f in c.fonts:
+    print(f'{name(f,6)+".ttf":<34}{name(f,1):<23}{name(f,2)}')
+```
+
+运行结果（共 70 行；为简洁仅展示首尾及代表性字重，结构相同的中间行用 `...` 省略）：
+
+```
+filename (.ttf)                   Family(1)             Subfamily(2)
+------------------------------------------------------------------------
+SourceHanMono-ExtraLight.ttf      Source Han Mono EL    Regular
+SourceHanMono-ExtraLightIt.ttf    Source Han Mono EL    Italic
+SourceHanMonoK-ExtraLight.ttf     Source Han Mono K EL  Regular
+SourceHanMonoK-ExtraLightIt.ttf   Source Han Mono K EL  Italic
+SourceHanMonoSC-ExtraLight.ttf    Source Han Mono SC EL Regular
+SourceHanMonoSC-ExtraLightIt.ttf  Source Han Mono SC EL Italic
+SourceHanMonoTC-ExtraLight.ttf    Source Han Mono TC EL Regular
+SourceHanMonoTC-ExtraLightIt.ttf  Source Han Mono TC EL Italic
+SourceHanMonoHC-ExtraLight.ttf    Source Han Mono HC EL Regular
+SourceHanMonoHC-ExtraLightIt.ttf  Source Han Mono HC EL Italic
+  ... （Light / Normal，省略 index 10–29）
+SourceHanMono-Regular.ttf         Source Han Mono       Regular
+SourceHanMono-RegularIt.ttf       Source Han Mono       Italic
+  ... （Regular 其余区域 + Medium，省略 index 32–49）
+SourceHanMono-Bold.ttf            Source Han Mono       Bold
+SourceHanMono-BoldIt.ttf          Source Han Mono       Bold Italic
+  ... （Bold 其余区域 + Heavy，省略 index 52–68）
+SourceHanMonoHC-HeavyIt.ttf       Source Han Mono HC H  Italic
+```
+
+70 = 7 字重 × 5 区域 × 2（正体/斜体）：字重 EL/L/N/M/B/H（Regular 无缩写）；区域 默认(日)/K(韩)/SC(简)/TC(繁)/HC(港)。
+
+**② 单个子字体的全部 name 记录**
+
+上面只取了 Family/Subfamily。一个子字体实际携带的 name 记录远不止这些——以 index 0（ExtraLight）为例，把它的 name 表（Windows 平台、英文）逐条 dump 出来（超长文本截断显示）：
+
+```python
+f0 = c.fonts[0]                       # 取 index 0
+for r in f0['name'].names:
+    if (r.platformID, r.platEncID, r.langID) == (3, 1, 0x409):
+        v = r.toUnicode()
+        print(f"{r.nameID:>2}  {v[:58]}{'…' if len(v)>58 else ''}")
+```
+
+```
+ 0  © 2014–2019 Adobe (http://www.adobe.com/), with Reserved F…
+ 1  Source Han Mono EL
+ 2  Regular
+ 3  1.002;ADBO;SourceHanMono-ExtraLight;ADOBE
+ 4  Source Han Mono EL
+ 5  Version 1.002;hotconv 1.0.107;makeotfexe 2.5.65593
+ 6  SourceHanMono-ExtraLight
+ 7  Source is a trademark of Adobe in the United States and/or…
+ 8  Adobe
+ 9  Ryoko NISHIZUKA 西塚涼子 (kana, bopomofo & ideographs); Paul D…
+10  Dr. Ken Lunde (project architect, glyph set definition & o…
+11  http://www.adobe.com/type/
+13  This Font Software is licensed under the SIL Open Font Lic…
+14  http://scripts.sil.org/OFL
+16  Source Han Mono
+17  EL
+```
+
+可见一个子字体携带 **16 条** name 记录（本字体没有 nameID 12、15、18–25）。常见 nameID 含义速查：
+
+| nameID | 含义               | nameID  | 含义                             |
+| ------ | ------------------ | ------- | -------------------------------- |
+| 0      | Copyright 版权     | 9       | Designer 设计师                  |
+| 1      | Family 家族名      | 10      | Description 描述                 |
+| 2      | Subfamily 子族名   | 11      | Vendor URL 厂商网址              |
+| 3      | Unique ID 唯一标识 | 13      | License 许可证                   |
+| 4      | Full Name 全名     | 14      | License URL                      |
+| 5      | Version 版本       | 16      | Preferred Family 首选家族        |
+| 6      | PostScript 名      | 17      | Preferred Subfamily 首选子族     |
+| 7      | Trademark 商标     | 21 / 22 | WWS Family / Subfamily           |
+| 8      | Manufacturer 厂商  | 25      | Variations PS Prefix（可变字体） |
+
+几个要点：
+
+- **nameID 6（PostScript 名）** 是文件名与唯一标识的依据，解包 `.ttf` 就用它（见 ①）。
+- **"4 样式限制"技巧（nameID 1/2 vs 16/17）**：index 0 的 Family(1) 是 `Source Han Mono EL`（字重被塞进家族名），Subfamily(2) 是 Regular；真正的家族/字重在 **16/17**（`Source Han Mono` / `EL`）。这是为兼容**老软件每个家族只认 4 种样式**(Regular/Italic/Bold/Bold Italic)——非标准字重重组成"假家族"；而 Regular/Bold（标准 4 样式）恰好相反：16/17 留空、真名在 1/2：
+
+  | 子字体             | Family(1)          | Subfamily(2) | PreferredFamily(16) | PreferredSubfamily(17) |
+  | ------------------ | ------------------ | ------------ | ------------------- | ---------------------- |
+  | index 0 ExtraLight | Source Han Mono EL | Regular      | Source Han Mono     | EL                     |
+  | index 30 Regular   | Source Han Mono    | Regular      | (空)                | (空)                   |
+  | index 50 Bold      | Source Han Mono    | Bold         | (空)                | (空)                   |
+
+  思源、Noto CJK 等大家族字体普遍采用此策略。
+
+> 💡 **纯 ttx CLI 也能看**：`ttx -y 0 -t name -o - SourceHanMono.ttc` 会把 index 0 的 name 表反编译成 XML 直接输出，可逐条核对每条 `<namerecord>`。
+
+### 3.3.6 实战：Songti.ttc 完整枚举
 
 下面的脚本对 `Songti.ttc` 的 8 个字体逐一提取上述字段（繁体缺失时回退到简体串，模拟系统字体选择器的行为）：
 
@@ -501,17 +681,147 @@ for i, f in enumerate(c.fonts):
 
 > 💡 **纯 ttx CLI 也能看 name 表**：`ttx -y 4 -t name -o - Songti.ttc` 会把 index 4 的 name 表反编译成 XML 打到标准输出，可直接看到每条 `<namerecord nameID="..." platformID="..." encodingID="..." langID="...">` 的对应关系，便于人工核对。
 
+### 3.3.7 什么是 Super TTC（Super OTC）
+
+前面 3.3.5 的 `SourceHanMono.ttc` 一个文件装了 **70 个**子字体却体积可控——这背后是 **Super TTC**（Adobe 称 **Super OTC**）：把**整个家族（全部字重 × 全部语言/区域）**塞进一个集合文件，靠**最大化 sfnt 表共享**来压缩体积。
+
+普通 TTC 和 Super TTC **底层机制相同**（都是 sfnt 表按偏移共享），区别只在共享的彻底程度。对比：
+
+| 维度     | 普通 TTC/OTC                                     | Super TTC/OTC                                      |
+| -------- | ------------------------------------------------ | -------------------------------------------------- |
+| 打包范围 | 任意若干字体（常一个字重或几个）                 | 整个家族：全部字重 × 全部语言/区域                |
+| 实例数   | 少（msyh 2、cambria 2、Songti 8）                | 多（几十个：Source Han Sans 45、SourceHanMono 70） |
+| 表共享   | 字节相同的表按偏移共享（msyh 25 张表共享 19 张） | 同机制，但最大化去重（见下表）                     |
+| 体积收益 | 中等                                             | 最大（比独立 OTC 省 13 MB+）                       |
+
+Super TTC 在打包阶段就按字重/语言维度做了最大化去重——最大的几张表这样分摊：
+
+| 表                             | 共享维度              | 唯一份数     |
+| ------------------------------ | --------------------- | ------------ |
+| `CFF ` / `hmtx` / `vmtx` | 按**字重**      | 每个字重一份 |
+| `GSUB`                       | 按**语言/区域** | 每个语言一份 |
+| `cmap`                       | 按 语言 × 比例/半宽  | 每组合一份   |
+
+以 Adobe 官方 Source Han Sans 的 **Super OTC** 为例：7 个字重 × 5 个语言（+ Regular/Bold 的半宽变体）= **45 个字体实例、458,745 个字形**，却只有 **7 个 CFF、5 个 GSUB、10 个 cmap**——相比 7 个独立的按字重 OTC **省下 13 MB+**。
+
+我们的 `SourceHanMono.ttc` 就是这种结构。用 `ttx -l -y` 看不同 index 的 `CFF` 表偏移，能直接看到"同一字重共享一个 CFF"：
+
+```
+$ ttx -l -y 0 SourceHanMono.ttc      # ExtraLight, default, Regular
+    CFF   0x911751C3  15010995     20732
+$ ttx -l -y 4 SourceHanMono.ttc      # ExtraLight, SC, Regular
+    CFF   0x911751C3  15010995     20732     ← 与 index 0 同一份 CFF（校验和、偏移全同）
+$ ttx -l -y 30 SourceHanMono.ttc     # Regular, default
+    CFF   0x0171E9C8  16253281  47377044     ← 另一份（Regular 字重）
+$ ttx -l -y 50 SourceHanMono.ttc     # Bold, default
+    CFF   0x67DEB2E5  16858190  79990176     ← 又一份（Bold 字重）
+```
+
+index 0 与 4（同为 ExtraLight、不同区域）的 CFF 偏移都是 **20732**、校验和相同——它们**共用同一份 CFF**；换字重（Regular→47377044、Bold→79990176）才是另一份。所以 70 个子字体实际只有 **7 个 CFF**（每个字重一份，由该字重的 10 个"区域 × 正/斜体"变体共享），这就是它能塞下 70 个字体的原因。
+
+> ⚠️ **代价**：Super TTC/OTC 是最紧凑的静态字体打包方式，但 OpenType Collection 的系统/应用支持不如单字体普遍；且各子字体共用名字空间，装了 Super OTC 就不能再单独装同名的语言专用 OTF。需要单字体时，可像 3.3.5 那样按 index 解包成独立的 `.ttf`。
+
+### 3.3.8 实战：拆解 Super TTC（以 Sarasa 为例）
+
+下面用更纱黑体（Sarasa）做对比——它同时提供单字重 TTC 和 Super TTC，正好体现两者的拆解差异：
+
+| 文件                    | 类型                            | 子字体数      | 体积             |
+| ----------------------- | ------------------------------- | ------------- | ---------------- |
+| `Sarasa-SemiBold.ttc` | 单字重 TTC                      | 48            | 79 MB            |
+| `Sarasa-SuperTTC.ttc` | **Super TTC**（全部字重） | **480** | **793 MB** |
+
+先数数量（`ttx -l` 报错即透露范围）：
+
+```
+$ ttx -l Sarasa-SemiBold.ttc
+ERROR: specify a font number between 0 and 47 (inclusive)     ← 48 个
+$ ttx -l Sarasa-SuperTTC.ttc
+ERROR: specify a font number between 0 and 479 (inclusive)    ← 480 个
+```
+
+**⚠️ 坑一：整包载入会爆内存（OOM）**
+
+前面几节用的 `TTCollection()` 会把**全部**子字体一次性载入内存。对 793 MB、480 字体的 Super TTC，直接 `MemoryError`：
+
+```
+>>> from fontTools.ttLib import TTCollection
+>>> TTCollection('Sarasa-SuperTTC.ttc')
+MemoryError
+```
+
+正确做法：用 `TTFont(file, fontNumber=N)` **一次只开一个**（惰性加载，只读该字体引用的表，不读整包）。下面示范只拆**前 12 个**——Super TTC 千万别整包拆（见坑二）：
+
+```python
+from fontTools.ttLib import TTFont
+import os
+os.makedirs('unpack', exist_ok=True)
+for i in range(12):                                       # 只取前 12 个示范；实际按需
+    f = TTFont('Sarasa-SuperTTC.ttc', fontNumber=i)       # 一次一个，不爆内存
+    ps = f['name'].getName(6, 3, 1, 0x409).toUnicode()    # PostScript 名做文件名
+    f.save(f'unpack/{ps}.ttf')
+    f.close()                                             # 及时释放
+    print(i, ps)
+```
+
+```
+ 0  Sarasa-Gothic-CL-ExtraLight
+ 1  Sarasa-Gothic-SC-ExtraLight
+ 2  Sarasa-Gothic-TC-ExtraLight
+ 3  Sarasa-Gothic-HC-ExtraLight
+ 4  Sarasa-Gothic-J-ExtraLight
+ 5  Sarasa-Gothic-K-ExtraLight
+ 6  Sarasa-UI-CL-ExtraLight
+ 7  Sarasa-UI-SC-ExtraLight
+ 8  Sarasa-UI-TC-ExtraLight
+ 9  Sarasa-UI-HC-ExtraLight
+10  Sarasa-UI-J-ExtraLight
+11  Sarasa-UI-K-ExtraLight
+```
+
+前 12 个都是 ExtraLight 字重、两个家族（Gothic / UI）× 六个区域（CL/SC/TC/HC/J/K），可见 480 = 若干字重 × 家族 × 区域 的组合。
+
+**⚠️ 坑二：拆解后体积暴涨（与普通 TTC 的关键差异）**
+
+Super TTC 靠**共享 `glyf`** 压缩体积（同一字重的全部字体共用一份 ~44 MB 的 `glyf`）。一旦拆成独立 `.ttf`，每个文件都要自带一份 `glyf`，共享红利瞬间消失。以较小的单字重 `Sarasa-SemiBold.ttc` 实测（拆出 index 0）：
+
+```
+$ ls -l Sarasa-SemiBold.ttc
+79 MB                              ← 原始 TTC（48 字体，glyf 共享 1 份）
+$ ls -l Sarasa-Gothic-CL-SemiBold.ttf
+43 MB                              ← 单个就 43 MB（自带完整 glyf）
+```
+
+|                         | 原始 TTC   | 拆成独立`.ttf`                     |
+| ----------------------- | ---------- | ------------------------------------ |
+| 前 12 个                | （共享中） | 12 × 43 MB ≈**500 MB**       |
+| 全部 48 个（单字重）    | 79 MB      | 48 × 43 MB ≈**2 GB**（26×） |
+| 全部 480 个（SuperTTC） | 793 MB     | ≈**20 GB**（不现实）          |
+
+所以——**只拆你真正需要的那个 index**，绝不要整包拆。
+
+**普通 TTC vs Super TTC 拆解对比**：
+
+| 维度                        | 普通 TTC（Sarasa-SemiBold）        | Super TTC（Sarasa-SuperTTC）        |
+| --------------------------- | ---------------------------------- | ----------------------------------- |
+| 子字体数                    | 48                                 | 480                                 |
+| `TTCollection()` 整包载入 | 可行（79 MB）                      | **OOM**（793 MB，必须逐个开） |
+| 单字体拆解 API              | `TTFont(f, fontNumber=N).save()` | **相同**                      |
+| 整包拆解后体积              | ~2 GB（26×）                      | ~20 GB（不现实）                    |
+| 建议                        | 按需拆                             | **只拆需要的 index**          |
+
+> 💡 **挑选 index**：不知道某个 index 是哪个字体时，先开它读 PostScript 名（nameID=6）即可——`TTFont(f, fontNumber=N)['name'].getName(6,3,1,0x409)`，无需保存文件。这与 3.3.5 / 3.3.6 的"name 表"手法一脉相承。
+
 ## 3.4 TrueType vs OpenType/CFF：两种轮廓格式
 
 这是理解字体的**核心区分点**，也直接决定 ttx 输出的差异：
 
-| 维度 | TrueType（`.ttf`） | OpenType/CFF（`.otf`） |
-|------|--------------------|------------------------|
-| 轮廓表 | `glyf` + `loca` | `CFF ` |
-| 曲线类型 | 二次贝塞尔（控制点 `on`/`off`） | 三次贝塞尔 |
-| hinting | TrueType 指令（`fpgm`/`prep`/`cvt`） | CFF 提示（Private dict 里的 `BlueValues` 等） |
-| `maxp` 表 | 32 字节，含 15 个限制字段 | 仅 6 字节（版本 + numGlyphs） |
-| 后缀 | `.ttf` | `.otf`（但 `.otf` 也能装 glyf） |
+| 维度        | TrueType（`.ttf`）                       | OpenType/CFF（`.otf`）                       |
+| ----------- | ------------------------------------------ | ---------------------------------------------- |
+| 轮廓表      | `glyf` + `loca`                        | `CFF `                                       |
+| 曲线类型    | 二次贝塞尔（控制点`on`/`off`）         | 三次贝塞尔                                     |
+| hinting     | TrueType 指令（`fpgm`/`prep`/`cvt`） | CFF 提示（Private dict 里的`BlueValues` 等） |
+| `maxp` 表 | 32 字节，含 15 个限制字段                  | 仅 6 字节（版本 + numGlyphs）                  |
+| 后缀        | `.ttf`                                   | `.otf`（但 `.otf` 也能装 glyf）            |
 
 > 注意：**文件后缀不绝对等于轮廓类型**。`.otf` 既可以装 CFF 也可以装 glyf，判定依据是表里有没有 `CFF ` 表还是 `glyf` 表。
 
@@ -620,10 +930,10 @@ Done dumping TTX in 0.006 seconds
 $ ttx -q -t head -t name -t maxp -d ttx_out times.ttf
 ```
 
-| 导出方式 | 文件大小 |
-|----------|----------|
-| 完整 `times.ttx`（全部表） | **22 549 613 字节**（22.5 MB） |
-| `-t head,name,maxp`（仅 3 表） | **14 515 字节**（14 KB） |
+| 导出方式                         | 文件大小                             |
+| -------------------------------- | ------------------------------------ |
+| 完整`times.ttx`（全部表）      | **22 549 613 字节**（22.5 MB） |
+| `-t head,name,maxp`（仅 3 表） | **14 515 字节**（14 KB）       |
 
 ### `-x` 排除指定表（可多个）
 
@@ -842,11 +1152,11 @@ $ ttx -m times.ttf -o ttx_out/merged.ttf ttx_out/times#1.ttx
 
 ## 5.4 其余编译选项
 
-| 选项 | 用途 |
-|------|------|
-| `-b` | 不重算字形包围盒，用 TTX 里的原值（默认会重算） |
-| `--with-zopfli` | 生成 WOFF 时用 Zopfli 压缩（更小更慢，需装 zopfli） |
-| `--optimize-font-speed` | 编译时优化渲染速度优先于体积（产物更大，HarfBuzz 等渲染更快），主要影响 `glyf`/`gvar`/`VARC` |
+| 选项                      | 用途                                                                                              |
+| ------------------------- | ------------------------------------------------------------------------------------------------- |
+| `-b`                    | 不重算字形包围盒，用 TTX 里的原值（默认会重算）                                                   |
+| `--with-zopfli`         | 生成 WOFF 时用 Zopfli 压缩（更小更慢，需装 zopfli）                                               |
+| `--optimize-font-speed` | 编译时优化渲染速度优先于体积（产物更大，HarfBuzz 等渲染更快），主要影响`glyf`/`gvar`/`VARC` |
 
 ---
 
@@ -1073,6 +1383,7 @@ $ ttx -m times.ttf -o ttx_out/merged.ttf ttx_out/times#1.ttx
 ```
 
 关键概念：
+
 - **`ROS`**（Registry/Ordering/Supplement）声明这是 CID 字体，用 Adobe-Identity-0 排序。
 - **`CIDCount`** 65535 = CID 编号空间上限。
 - **`FDArray`/`FDSelect`**：把字形分组到多个 FontDict（不同字符集用不同 hinting 参数），是 CJK CID 字体管理海量字形的方式。
@@ -1132,7 +1443,65 @@ Cambria Math 独有，定义数学排版常量与字形变体：
 结构：脚本(Script，如 `latn`/`arab`/`hani`) → 语言(LangSys，如 `ENG `) → 特性(Feature，如 `liga` 连字/`kern` 字距) → 查找(Lookup，具体替换规则)。
 
 - **GSUB** 做替换：连字(`f`+`i`→`fi`)、风格替换、小型大写等。
-- **GPOS** 做定位：字距调整(`kern`)、标注定位、连音符等。
+- **GPOS** 做定位：字距调整(`kern`)、重音标注定位(`mark`/`mkmk`)、连音符等。
+
+### 6.11.1 `GPOS` 字距调整实例
+
+`GPOS` 与 `GSUB` 共用同一套"脚本→语言→特性→查找"骨架，区别只在 **Lookup 的类型**——GPOS 的查找描述"如何移动/对齐字形"。Times New Roman 的 GPOS 含 4 类特性：
+
+| 特性     | 含义                                     |
+| -------- | ---------------------------------------- |
+| `kern` | 成对字距调整（拉近/推远）                |
+| `mark` | 重音附着到基础字形（如 á 中 ´ 贴到 a） |
+| `mkmk` | 标注附着到标注（叠加重音）               |
+| `cpsp` | 大写字母间距                             |
+
+`kern` 特性在 FeatureList 中指向若干 Lookup：
+
+```xml
+<FeatureRecord index="5">
+  <FeatureTag value="kern"/>
+  <Feature>
+    <!-- LookupCount=10 -->
+    <LookupListIndex index="0" value="21"/>
+    ...
+  </Feature>
+</FeatureRecord>
+```
+
+最核心的是这些 Lookup 里的 **PairPos（查找类型 2，成对字距）**。Times 用"基于类别(class)"的 Format 2：把"第一个字形"和"第二个字形"各自分组，再用一张行×列矩阵给出每组组合的间距，远比逐对列举紧凑：
+
+```xml
+<Lookup index="0">
+  <LookupType value="9"/>                <!-- 9=Extension：大表用 32 位扩展指针 -->
+  <LookupFlag value="8"/><!-- ignoreMarks -->
+  <ExtensionPos index="0" Format="1">
+    <ExtensionLookupType value="2"/>      <!-- 实际类型：PairPos -->
+    <PairPos Format="2">
+      <Coverage>                          <!-- 参与"第一字形"的字形 -->
+        <Glyph value="A"/> ... <Glyph value="T"/> <Glyph value="V"/> ...
+      </Coverage>
+      <ValueFormat1 value="4"/>           <!-- 4=只存 XAdvance（水平推进量） -->
+      <ClassDef1>                         <!-- 第一字形分组 -->
+        <ClassDef glyph="A" class="3"/> ...
+      </ClassDef1>
+      <ClassDef2>                         <!-- 第二字形分组 -->
+        ... <ClassDef glyph="T" class="11"/> <ClassDef glyph="V" class="12"/> ...
+      </ClassDef2>
+      <!-- 行=第一字形类，列=第二字形类，交叉处即字距 -->
+      <Class1Record index="3">            <!-- 第 3 行 = A -->
+        <Class2Record index="11"><Value1 XAdvance="-227"/></Class2Record>  <!-- A+T -->
+        <Class2Record index="12"><Value1 XAdvance="-264"/></Class2Record>  <!-- A+V -->
+        ...
+      </Class1Record>
+    </PairPos>
+  </ExtensionPos>
+</Lookup>
+```
+
+读法：`<Value1 XAdvance="-264"/>` 表示当 `A` 后接 `V` 时，把 `A` 的水平推进量**减少 264**（unitsPerEm=2048，约缩进 13%），让 `AV` 这类斜线形组合收紧、视觉间距均匀——这就是字距调整（kerning）的本质。负值拉近、正值推开。
+
+> 其他 GPOS 查找类型：类型 4 `MarkBasePos`（重音附着，`mark` 特性）、类型 6 `MarkMarkPos`（标注叠标，`mkmk`）、类型 1 `SinglePos`（单字形单独定位）。`ValueFormat` 是位掩码，决定 ValueRecord 存哪些量：`4`=XAdvance、`8`=YAdvance、`1`=XPlacement 等。
 
 ## 6.12 `vhea` / `vmtx` 纵向排版（CJK）
 
@@ -1207,18 +1576,201 @@ TrueType 字体的 hinting 由三张表配合（见 [4.8 节](#48--i-不反汇�
 
 `cvt` 里的值（如 1356=cap height、916=x-height）与 OS/2 表里的 `sCapHeight`/`sxHeight` 呼应，是 hinting 把字形关键高度"吸"到整数像素的依据。
 
+## 6.15 可变字体表族（fvar / STAT / avar / gvar / HVAR）
+
+可变字体（Variable Font）把一个**设计空间**（如字重从细到粗）压缩进单一文件：默认实例是基线轮廓，其余位置由各字形的"差量(delta)"经插值得到。相关表分工如下，演示字体 `NotoSerifCJKsc-VF.ttf`（思源宋体可变版）齐全——注意它是 **TrueType(`glyf`) 轮廓**的可变字体，而静态的思源宋体是 CFF(`.otf`)：
+
+| 表                | 作用                                                                                        |
+| ----------------- | ------------------------------------------------------------------------------------------- |
+| `fvar`          | 定义**轴**（轴标签 / 最小值 / 默认值 / 最大值）与若干**命名实例**（预设快捷档） |
+| `STAT`          | 给每个轴值取名并标注取值范围，供应用的"字重选择器"展示                                      |
+| `avar`          | 把用户输入的轴坐标（归一化后）**非线性重映射**到设计的归一化值                        |
+| `gvar`          | 每个字形在每个轴方向的**点位移差量**（决定形状如何随轴变化）                          |
+| `HVAR`/`VVAR` | 水平 / 垂直**推进宽度**(advance) 的差量（决定间距如何随轴变化）                       |
+
+这个可变字体比静态字体多了 `fvar`/`STAT`/`avar`/`gvar`/`HVAR` 五张表。`ttx -l` 节选这几张及相关表如下（`cmap`/`GSUB` 等其余表与静态字体无异，已省略）：
+
+```
+$ ttx -l NotoSerifCJKsc-VF.ttf
+    tag     checksum    length    offset
+    ----  ----------  --------  --------
+    HVAR  0xD4DA58D3     63253  35578604
+    STAT  0x80E79632       182  35641860
+    avar  0x79F58926        42  35642044
+    fvar  0x8D4C75DC       106  35642088
+    glyf  0xCCA2ECA7  34269540    759092
+    gvar  0x032BB0A0  24257464  35642196   ← 24 MB，全字体最大
+```
+
+`fvar`/`STAT`/`avar` 都很小（百字节级），而 `gvar`（24 MB）甚至比 `glyf`（34 MB）以外的任何表都大——它承载了全部 65535 个字形在轴上的差量。
+
+### 6.15.1 `fvar`：轴定义与命名实例
+
+```xml
+<fvar>
+  <!-- Weight -->
+  <Axis>
+    <AxisTag>wght</AxisTag>
+    <Flags>0x0</Flags>
+    <MinValue>200.0</MinValue>
+    <DefaultValue>200.0</DefaultValue>
+    <MaxValue>900.0</MaxValue>
+    <AxisNameID>265</AxisNameID>          <!-- 用 name 表 265 号字符串命名此轴 -->
+  </Axis>
+
+  <!-- 7 个命名实例：ExtraLight/Light/Regular/Medium/SemiBold/Bold/Black -->
+  <NamedInstance flags="0x0" postscriptNameID="267" subfamilyNameID="266">
+    <coord axis="wght" value="200.0"/>    <!-- ExtraLight -->
+  </NamedInstance>
+  ...
+  <NamedInstance flags="0x0" postscriptNameID="271" subfamilyNameID="270">
+    <coord axis="wght" value="400.0"/>    <!-- Regular -->
+  </NamedInstance>
+  ...
+</fvar>
+```
+
+- 单轴 `wght`，范围 200–900。**默认值 = 200（ExtraLight）**——即此字体的"原点"是最细款，只有"加粗"方向有差量。
+- 7 个 `NamedInstance` 是预置快捷档（下拉菜单里的选项），坐标如 `value="400.0"`；名字存在 `name` 表，由 `subfamilyNameID` 引用。
+
+### 6.15.2 `STAT`：样式属性轴值表
+
+`fvar` 只点了几个离散实例，`STAT` 则给**整条轴的连续区间**命名，让应用既列预设、又能自由滑动：
+
+```xml
+<STAT>
+  <DesignAxisRecordSize value="8"/>
+  <DesignAxisRecord>
+    <Axis index="0"><AxisTag value="wght"/><AxisNameID value="265"/><AxisOrdering value="0"/></Axis>
+  </DesignAxisRecord>
+  <!-- AxisValueCount=7 -->
+  <AxisValueArray>
+    <AxisValue index="2" Format="2">
+      <AxisIndex value="0"/>
+      <Flags value="2"/>                 <!-- ELIDABLE：常规字重，菜单中可省略 -->
+      <ValueNameID value="260"/>         <!-- Regular -->
+      <NominalValue value="400.0"/>
+      <RangeMinValue value="350.0"/>
+      <RangeMaxValue value="499.0"/>
+    </AxisValue>
+    ...（共 7 个，覆盖 200/300/400/500/600/700/900）...
+  </AxisValueArray>
+  <ElidedFallbackNameID value="256"/>    <!-- 省略时回退显示 Regular -->
+</STAT>
+```
+
+- `Format="2"` 是带区间的轴值（标称值 + Min/Max 范围）。Regular 的 `Flags value="2"`（`ELIDABLE`）表示它可被省略——常规字重不显示在字重菜单里。
+
+### 6.15.3 `avar`：轴的非线性映射
+
+没有 `avar` 时插值是纯线性的；`avar` 用分段映射把**用户输入的归一化值**(`from`)重映射到**设计的归一化值**(`to`)，实现非均匀的字重曲线：
+
+```xml
+<avar>
+  <version major="1" minor="0"/>
+  <segment axis="wght">
+    <mapping from="-1.0" to="-1.0"/>
+    <mapping from="0.0"  to="0.0"/>
+    <mapping from="0.1429" to="0.095"/>
+    <mapping from="0.2857" to="0.21"/>
+    <mapping from="0.4286" to="0.36"/>
+    <mapping from="0.5714" to="0.51"/>
+    <mapping from="0.7143" to="0.73"/>
+    <mapping from="1.0"   to="1.0"/>
+  </segment>
+</avar>
+```
+
+- 归一化：默认值(200)→`0.0`，最大值(900)→`1.0`。7 个命名实例的归一化位置恰好是 `0.0, 0.1429, 0.2857, 0.4286, 0.5714, 0.7143, 1.0`——正是 `from` 列。
+- `to` 列把中段"压"向细端（如 0.4286→0.36 而非 0.4286），即字重视觉上**先慢后快**地变粗，让各档字重的视觉间距更均匀。
+
+### 6.15.4 `gvar`：字形差量数据
+
+`gvar` 为每个字形记录各轴方向的**点位移差量**。字形 `A`（29 个点）在 `wght` 轴峰值 1.0（最粗）处的差量：
+
+```xml
+<glyphVariations glyph="A">
+  <tuple>
+    <coord axis="wght" value="1.0"/>      <!-- 本 tuple 在 wght=1.0(=900，最粗) 处取峰值 -->
+    <delta pt="0" x="3" y="0"/>
+    <delta pt="1" x="3" y="5"/>
+    <delta pt="2" x="5" y="10"/>
+    ...
+    <delta pt="8" x="67" y="20"/>         <!-- 该点右移 67、上移 20 -->
+    <delta pt="9" x="77" y="0"/>          <!-- 横画右端点外扩 77（加粗主因） -->
+    ...
+    <delta pt="28" x="0" y="0"/>
+  </tuple>
+</glyphVariations>
+```
+
+- 把 `glyf` 里 `A` 每个点的坐标加上对应 `(x,y)` 差量，即得到 Bold 版的 `A`；中间轴位置由两端按 `avar` 曲线插值。
+- `<delta pt="9" x="77">` 这种大位移对应横画加粗后端点外扩。一个 `<tuple>` 对应一个"主样式"(master)；本字体只有默认(200)+最粗(900)两个 master，故大多数字形（65022 个）各含一个 tuple——另有 513 个零差量字形（如空格，加粗也不变形）。
+
+### 6.15.5 `HVAR`：水平度量差量
+
+`gvar` 只管字形形状，**水平推进宽度**(advance width) 的变化由 `HVAR` 提供，否则加粗后字间距会全错。它用 **ItemVariationStore**（区域 + 差量表）+ **间接映射** 做去重压缩：
+
+```xml
+<HVAR>
+  <Version value="0x00010000"/>
+  <VarStore Format="1">
+    <VarRegionList>
+      <!-- RegionCount=1 -->
+      <Region index="0">
+        <VarRegionAxis index="0">
+          <StartCoord value="0.0"/><PeakCoord value="1.0"/><EndCoord value="1.0"/>
+        </VarRegionAxis>
+      </Region>
+    </VarRegionList>
+    <!-- VarDataCount=2 -->
+    <VarData index="0">
+      <!-- ItemCount=89 -->
+      <VarRegionIndex index="0" value="0"/>
+      <Item index="0" value="[-101]"/>
+      <Item index="4" value="[0]"/>
+      ...
+    </VarData>
+    <VarData index="1">
+      <!-- ItemCount=13 -->
+      <Item index="0" value="[133]"/>
+      ...
+    </VarData>
+  </VarStore>
+  <AdvWidthMap>
+    <Map glyph=".notdef"  outer="0" inner="4"/>
+    <Map glyph="A"        outer="0" inner="40"/>
+    <Map glyph="quotedbl" outer="1" inner="1"/>
+    ...
+  </AdvWidthMap>
+</HVAR>
+```
+
+- 差量被高度去重：65535 个字形只存了 89+13 = **102 个唯一宽度差量**（`VarData` 的 `Item`），每个字形用 `AdvWidthMap` 的 `outer`(选哪个 `VarData`) + `inner`(选哪一项) 间接引用。如 `A`→VarData[0] 第 40 项，`quotedbl`→VarData[1] 第 1 项。
+- 正因如此 `HVAR` 才 63 KB——若每个字形各存一份将是数 MB。竖排度量的差量由 `VVAR` 承担（本字体无此表）。
+
+> **dump 这些表的技巧**：`gvar` 全量 dump 会生成上百 MB 的 XML。检视单个字形时，用 fontTools 的 Python API只取一个字形即可（下例输出即为真实 TTX 片段）：
+>
+> ```python
+> from fontTools.ttLib import TTFont
+> font = TTFont("NotoSerifCJKsc-VF.ttf")
+> gvar = font["gvar"]
+> gvar.variations = {"A": gvar.variations["A"]}   # 只留 A
+> font.saveXML("A_gvar.ttx", tables=["gvar"])
+> ```
+
 ---
 
 # 第七部分　字体特性与功能
 
 ## 7.1 两种轮廓格式
 
-| | TrueType `glyf` | PostScript `CFF ` |
-|---|---|---|
-| 曲线 | 二次贝塞尔（`on`/`off` 点） | 三次贝塞尔 |
-| 数据形态 | 显式点坐标 + 指令 | 紧凑的 charstring 操作码 |
-| hinting | 指令式（强大、可编程） | 声明式（BlueValues 等） |
-| 典型 | `.ttf`（如 Times、雅黑） | `.otf`（如思源、Adobe 字体） |
+|          | TrueType`glyf`                | PostScript`CFF `             |
+| -------- | ------------------------------- | ------------------------------ |
+| 曲线     | 二次贝塞尔（`on`/`off` 点） | 三次贝塞尔                     |
+| 数据形态 | 显式点坐标 + 指令               | 紧凑的 charstring 操作码       |
+| hinting  | 指令式（强大、可编程）          | 声明式（BlueValues 等）        |
+| 典型     | `.ttf`（如 Times、雅黑）      | `.otf`（如思源、Adobe 字体） |
 
 判定方法：`ttx -l` 看有 `glyf` 还是 `CFF ` 表。
 
@@ -1246,9 +1798,9 @@ TrueType 字体可在小字号下用字节码指令把字形对齐到像素网�
 
 部分字体在小字号下用预渲染的位图替代矢量轮廓以保证清晰（如 Cambria 的 `EBDT`/`EBLC`）。ttx 用 `-z` 控制位图导出格式（`raw`/`row`/`bitwise`/`extfile`），其中 `bitwise` 能肉眼看到点阵形状。
 
-## 7.8 可变字体（fvar/gvar/HVAR，简介）
+## 7.8 可变字体（fvar/STAT/avar/gvar/HVAR）
 
-可变字体（Variable Fonts）在一份文件里用 `fvar`（轴定义，如字重/字宽）、`gvar`（字形变体数据）、`HVAR`/`VVAR`（度量变体）表达一个设计空间，浏览器/应用通过插值得到任意中间样式。ttx 能 dump/compile 这些表（需带 `--optimize-font-speed` 影响其编译），本文演示字体中暂无可变字体实例。
+可变字体（Variable Fonts）在一份文件里用 `fvar`（轴定义，如字重/字宽）、`STAT`（轴值命名与取值范围）、`avar`（用户轴→设计轴的非线性映射）、`gvar`（字形差量）、`HVAR`/`VVAR`（水平/垂直度量差量）表达一个连续设计空间，浏览器/应用通过插值得到任意中间样式，无需为每个字重单独打包字体。本文演示字体 `NotoSerifCJKsc-VF.ttf`（思源宋体可变版）是一个单 `wght` 轴（200–900）的可变字体，各表的 TTX 结构详见 [6.15 节](#615-可变字体表族fvar-stat-avar-gvar-hvar)。ttx 能正常 dump/compile 这些表；编译时加 `--optimize-font-speed` 会改变 `gvar`/`VARC` 的编码方式，产物更大但 HarfBuzz 等渲染更快。
 
 ---
 
@@ -1293,49 +1845,70 @@ ttx font.ttf                                  # 字体 → ttx
 ttx --flavor woff2 -o font.woff2 font.ttx     # ttx → woff2
 ```
 
+## 8.6 检视 / 修改可变字体的轴
+
+先确认是不是可变字体（含 `fvar`/`gvar`），再单独导出轴定义表做检视或修改：
+
+```bash
+ttx -l font.ttf                                # 看是否含 fvar/gvar（可变字体）
+ttx -t fvar -t STAT -t avar -t name font.ttf   # 只导出轴定义与命名
+# 编辑 font.ttx 里的轴范围 / 命名实例后，合并回原字体
+ttx -m font.ttf -o newfont.ttf font.ttx
+```
+
+要从一个可变字体**提取某个静态字重**（如 Bold 700），用同属 fontTools 的实例化器（`fontTools.varLib.instancer`，Python API）：
+
+```bash
+python -c "from fontTools.ttLib import TTFont; from fontTools.varLib import instancer; \
+instancer.instantiateVariableFont(TTFont('font.ttf'), {'wght':700}).save('font-Bold.ttf')"
+```
+
+实例化产物不再含 `fvar`/`gvar`/`HVAR` 等表，是一个普通静态字体（`ttx -l` 可验证）。
+
 ---
 
 # 附录 A　命令行选项速查表
 
-| 选项 | 类别 | 作用 |
-|------|------|------|
-| `-h` | 通用 | 打印帮助 |
-| `--version` | 通用 | 显示版本 |
-| `-d <目录>` | 通用 | 输出目录（须先存在） |
-| `-o <文件>` | 通用 | 输出文件名；`-o -` 为 stdout（与 `-d` 同用时优先） |
-| `-f` | 通用 | 覆盖而非追加序号 |
-| `-v` | 通用 | 详细输出 |
-| `-q` | 通用 | 静默 |
-| `-a` | 通用 | 允许虚拟字形 ID |
-| `-l` | Dump | 列表模式（不导出） |
-| `-t <表>` | Dump | 只导出指定表（可多个） |
-| `-x <表>` | Dump | 排除指定表（可多个，与 `-t` 互斥） |
-| `-s` | Dump | 按表拆分 |
-| `-g` | Dump | 按字形拆分 glyf（隐含 `-s`） |
-| `-i` | Dump | 指令不反汇编（输出 hex） |
-| `-z <格式>` | Dump | 位图格式 raw/row/bitwise/extfile |
-| `-e` | Dump | 不忽略错误（完整 traceback） |
-| `-y <编号>` | Dump | 选 TTC 字体编号 |
-| `--unicodedata` | Dump | 自定义字符名数据库 |
-| `--newline` | Dump | 行尾 LF/CR/CRLF |
-| `-m <字体>` | Compile | 合并 TTX 进已有字体 |
-| `-b` | Compile | 不重算字形 bbox |
-| `--recalc-timestamp` | Compile | 时间戳设为当前 |
-| `--no-recalc-timestamp` | Compile | 保留原时间戳 |
-| `--flavor <类型>` | Compile | woff / woff2 |
-| `--with-zopfli` | Compile | WOFF 用 Zopfli 压缩 |
-| `--optimize-font-speed` | Compile | 渲染速度优先 |
+| 选项                      | 类别    | 作用                                                   |
+| ------------------------- | ------- | ------------------------------------------------------ |
+| `-h`                    | 通用    | 打印帮助                                               |
+| `--version`             | 通用    | 显示版本                                               |
+| `-d <目录>`             | 通用    | 输出目录（须先存在）                                   |
+| `-o <文件>`             | 通用    | 输出文件名；`-o -` 为 stdout（与 `-d` 同用时优先） |
+| `-f`                    | 通用    | 覆盖而非追加序号                                       |
+| `-v`                    | 通用    | 详细输出                                               |
+| `-q`                    | 通用    | 静默                                                   |
+| `-a`                    | 通用    | 允许虚拟字形 ID                                        |
+| `-l`                    | Dump    | 列表模式（不导出）                                     |
+| `-t <表>`               | Dump    | 只导出指定表（可多个）                                 |
+| `-x <表>`               | Dump    | 排除指定表（可多个，与`-t` 互斥）                    |
+| `-s`                    | Dump    | 按表拆分                                               |
+| `-g`                    | Dump    | 按字形拆分 glyf（隐含`-s`）                          |
+| `-i`                    | Dump    | 指令不反汇编（输出 hex）                               |
+| `-z <格式>`             | Dump    | 位图格式 raw/row/bitwise/extfile                       |
+| `-e`                    | Dump    | 不忽略错误（完整 traceback）                           |
+| `-y <编号>`             | Dump    | 选 TTC 字体编号                                        |
+| `--unicodedata`         | Dump    | 自定义字符名数据库                                     |
+| `--newline`             | Dump    | 行尾 LF/CR/CRLF                                        |
+| `-m <字体>`             | Compile | 合并 TTX 进已有字体                                    |
+| `-b`                    | Compile | 不重算字形 bbox                                        |
+| `--recalc-timestamp`    | Compile | 时间戳设为当前                                         |
+| `--no-recalc-timestamp` | Compile | 保留原时间戳                                           |
+| `--flavor <类型>`       | Compile | woff / woff2                                           |
+| `--with-zopfli`         | Compile | WOFF 用 Zopfli 压缩                                    |
+| `--optimize-font-speed` | Compile | 渲染速度优先                                           |
 
 ---
 
 # 附录 B　演示字体清单
 
-| 文件 | 类型 | 来源 | 演示重点 |
-|------|------|------|----------|
-| `times.ttf` | 西文 TrueType | Windows 系统字体 | glyf 轮廓、TrueType hinting(fpgm/prep/cvt)、GSUB/GPOS/JSTF、hdmx/VDMX |
-| `msyh.ttc` | 中文 TTC(2字体) | Windows 微软雅黑 | TTC 集合(`-y`)、超大 cmap、CJK 纵向排版(vhea/vmtx)、MERG |
-| `cambria.ttc` | 数学 TTC(2字体) | Windows Office | **MATH 表**、嵌入式点阵(EBDT/EBLC)、`-z` 位图格式 |
-| `SourceHanSansSC-Regular.otf` | 中文 CFF | 思源黑体(开源) | **CID-keyed CFF**、VORG、BASE、6 字节 maxp、超大 GSUB |
+| 文件                            | 类型              | 来源                 | 演示重点                                                               |
+| ------------------------------- | ----------------- | -------------------- | ---------------------------------------------------------------------- |
+| `times.ttf`                   | 西文 TrueType     | Windows 系统字体     | glyf 轮廓、TrueType hinting(fpgm/prep/cvt)、GSUB/GPOS/JSTF、hdmx/VDMX  |
+| `msyh.ttc`                    | 中文 TTC(2字体)   | Windows 微软雅黑     | TTC 集合(`-y`)、超大 cmap、CJK 纵向排版(vhea/vmtx)、MERG             |
+| `cambria.ttc`                 | 数学 TTC(2字体)   | Windows Office       | **MATH 表**、嵌入式点阵(EBDT/EBLC)、`-z` 位图格式              |
+| `SourceHanSansSC-Regular.otf` | 中文 CFF          | 思源黑体(开源)       | **CID-keyed CFF**、VORG、BASE、6 字节 maxp、超大 GSUB            |
+| `NotoSerifCJKsc-VF.ttf`       | 中文可变 TrueType | 思源宋体可变版(开源) | **可变字体**：fvar/STAT/avar/gvar/HVAR，单 `wght` 轴(200–900) |
 
 > 以上均为真实字体（系统自带或开源），非合成。
 
@@ -1343,43 +1916,45 @@ ttx --flavor woff2 -o font.woff2 font.ttx     # ttx → woff2
 
 # 附录 C　常见表标签速查
 
-| 标签 | 全称 | 作用 |
-|------|------|------|
-| `head` | Font Header | 字体头（版本、unitsPerEm、bbox、时间戳） |
-| `name` | Naming | 字体名称、版权、版本字符串 |
-| `hhea` | Horizontal Header | 水平排版头 |
-| `hmtx` | Horizontal Metrics | 每字形水平度量（width/lsb） |
-| `vhea` | Vertical Header | 纵向排版头（CJK 竖排） |
-| `vmtx` | Vertical Metrics | 每字形纵向度量 |
-| `maxp` | Maximum Profile | 字形数 + 限制（TTF 详细 / CFF 极简） |
-| `OS/2` | OS/2 and Windows Metrics | 字重、字宽、PANOSE、Win 度量 |
-| `post` | PostScript Name | 字形名、斜体角、下划线 |
-| `cmap` | Character to Glyph Mapping | Unicode → 字形 |
-| `loca` | Index to Location | glyf 的字形偏移索引 |
-| `glyf` | Glyph Data | TrueType 轮廓 |
-| `CFF ` | Compact Font Format | PostScript/CFF 轮廓（含 CID） |
-| `VORG` | Vertical Origin | CFF 纵向原点 |
-| `BASE` | Baseline Data | 多脚本基线 |
-| `GSUB` | Glyph Substitution | 替换（连字/小型大写等） |
-| `GPOS` | Glyph Positioning | 定位（字距/标注） |
-| `GDEF` | Glyph Definition | 字形类别、附着点 |
-| `JSTF` | Justification | 两端对齐 |
-| `fpgm` | Font Program | TrueType 全局函数 |
-| `prep` | Control Value Program | TrueType 预程序 |
-| `cvt ` | Control Value Table | TrueType hinting 控制值 |
-| `gasp` | Grid-fitting/Scan-conversion | 按字号的 hinting 策略 |
-| `MATH` | Math Layout | 数学排版常量与变体 |
-| `EBDT`/`EBLC` | Embedded Bitmap Data/Location | 灰度点阵 |
-| `CBDT`/`CBLC` | Color Bitmap Data/Location | 彩色点阵 |
-| `hdmx` | Horizontal Device Metrics | 按字号的水平度量 |
-| `VDMX` | Vertical Device Metrics | 按字号的垂直度量 |
-| `LTSH` | Linear Threshold | 线性缩放阈值 |
-| `kern` | Kerning | 旧式字距（已被 GPOS 取代） |
-| `DSIG` | Digital Signature | 数字签名 |
-| `meta` | Metadata | 元数据 |
-| `fvar` | Font Variations | 可变字体轴定义 |
-| `gvar` | Glyph Variations | 可变字体字形变体 |
-| `HVAR`/`VVAR` | Metrics Variations | 可变字体度量变体 |
+| 标签              | 全称                          | 作用                                     |
+| ----------------- | ----------------------------- | ---------------------------------------- |
+| `head`          | Font Header                   | 字体头（版本、unitsPerEm、bbox、时间戳） |
+| `name`          | Naming                        | 字体名称、版权、版本字符串               |
+| `hhea`          | Horizontal Header             | 水平排版头                               |
+| `hmtx`          | Horizontal Metrics            | 每字形水平度量（width/lsb）              |
+| `vhea`          | Vertical Header               | 纵向排版头（CJK 竖排）                   |
+| `vmtx`          | Vertical Metrics              | 每字形纵向度量                           |
+| `maxp`          | Maximum Profile               | 字形数 + 限制（TTF 详细 / CFF 极简）     |
+| `OS/2`          | OS/2 and Windows Metrics      | 字重、字宽、PANOSE、Win 度量             |
+| `post`          | PostScript Name               | 字形名、斜体角、下划线                   |
+| `cmap`          | Character to Glyph Mapping    | Unicode → 字形                          |
+| `loca`          | Index to Location             | glyf 的字形偏移索引                      |
+| `glyf`          | Glyph Data                    | TrueType 轮廓                            |
+| `CFF `          | Compact Font Format           | PostScript/CFF 轮廓（含 CID）            |
+| `VORG`          | Vertical Origin               | CFF 纵向原点                             |
+| `BASE`          | Baseline Data                 | 多脚本基线                               |
+| `GSUB`          | Glyph Substitution            | 替换（连字/小型大写等）                  |
+| `GPOS`          | Glyph Positioning             | 定位（字距/标注）                        |
+| `GDEF`          | Glyph Definition              | 字形类别、附着点                         |
+| `JSTF`          | Justification                 | 两端对齐                                 |
+| `fpgm`          | Font Program                  | TrueType 全局函数                        |
+| `prep`          | Control Value Program         | TrueType 预程序                          |
+| `cvt `          | Control Value Table           | TrueType hinting 控制值                  |
+| `gasp`          | Grid-fitting/Scan-conversion  | 按字号的 hinting 策略                    |
+| `MATH`          | Math Layout                   | 数学排版常量与变体                       |
+| `EBDT`/`EBLC` | Embedded Bitmap Data/Location | 灰度点阵                                 |
+| `CBDT`/`CBLC` | Color Bitmap Data/Location    | 彩色点阵                                 |
+| `hdmx`          | Horizontal Device Metrics     | 按字号的水平度量                         |
+| `VDMX`          | Vertical Device Metrics       | 按字号的垂直度量                         |
+| `LTSH`          | Linear Threshold              | 线性缩放阈值                             |
+| `kern`          | Kerning                       | 旧式字距（已被 GPOS 取代）               |
+| `DSIG`          | Digital Signature             | 数字签名                                 |
+| `meta`          | Metadata                      | 元数据                                   |
+| `fvar`          | Font Variations               | 可变字体轴定义                           |
+| `STAT`          | Style Attributes              | 可变字体轴值命名与取值范围（供 UI）      |
+| `avar`          | Axis Variations               | 可变字体轴的非线性映射                   |
+| `gvar`          | Glyph Variations              | 可变字体字形变体                         |
+| `HVAR`/`VVAR` | Metrics Variations            | 可变字体度量变体                         |
 
 ---
 
